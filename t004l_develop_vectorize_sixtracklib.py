@@ -55,6 +55,7 @@ for i_part in range(n_part):
     part.delta += Ddelta_wrt_CO[i_part]
 
     part.partid = i_part
+    part.state = 1
 
     p.fromPySixTrack(part, i_part)
 
@@ -62,4 +63,5 @@ ps.tofile('particles.buffer')
 
 os.system('../sixtracklib/build/examples/c99/track_io_c99 particles.buffer elements.buffer 10 0 10 1')
 
+# res = pysixtracklib.ParticlesSet.fromfile('particles.buffer')
 res = pysixtracklib.ParticlesSet.fromfile('output_particles.bin')
