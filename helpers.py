@@ -201,6 +201,83 @@ def track_particle_pysixtrack(line, part, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
     return x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt
 
 
+def track_particle_sixtracklib(
+                            line, partCO, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
+                            Dy_wrt_CO_m, Dpy_wrt_CO_rad,
+                            Dsigma_wrt_CO_m, Ddelta_wrt_CO, n_turns
+                            ):
+
+
+    Dx_wrt_CO_m, Dpx_wrt_CO_rad,\
+        Dy_wrt_CO_m, Dpy_wrt_CO_rad,\
+        Dsigma_wrt_CO_m, Ddelta_wrt_CO = vectorize_all_coords(
+                             Dx_wrt_CO_m, Dpx_wrt_CO_rad,
+                             Dy_wrt_CO_m, Dpy_wrt_CO_rad,
+                             Dsigma_wrt_CO_m, Ddelta_wrt_CO)
+
+    part = pysixtrack.Particles(**partCO)
+
+    import pysixtracklib
+    elements = pysixtracklib.Elements.fromline(line)
+    for name, etype, ele in line:
+        getattr(elements, etype)(**ele._asdict())
+    elements.tofile("elements.buffer")
+
+    n_part = len(Dx_wrt_CO_m)
+
+    # Build PyST particle
+
+    ps = pysixtracklib.ParticlesSet()
+    p = ps.Particles(num_particles=n_part)
+
+    for i_part in range(n_part):
+
+        part = pysixtrack.Particles(**partCO)
+        part.x += Dx_wrt_CO_m[i_part]
+        part.px += Dpx_wrt_CO_rad[i_part]
+        part.y += Dy_wrt_CO_m[i_part]
+        part.py += Dpy_wrt_CO_rad[i_part]
+        part.sigma += Dsigma_wrt_CO_m[i_part]
+        part.delta += Ddelta_wrt_CO[i_part]
+
+        part.partid = i_part
+        part.state = 1
+
+        p.fromPySixTrack(part, i_part)
+
+    ps.tofile('particles.buffer')
+
+    os.system('../sixtracklib/build/examples/c99/track_io_c99 particles.buffer elements.buffer %d 0 %d 1'%(n_turns, n_turns))
+
+    # res = pysixtracklib.ParticlesSet.fromfile('particles.buffer')
+    res = pysixtracklib.ParticlesSet.fromfile('output_particles.bin')
+
+    x_tbt = []
+    px_tbt = []
+    y_tbt = []
+    py_tbt = []
+    sigma_tbt = []
+    delta_tbt = []
+    for i_turn in range(n_turns):
+        print(i_turn)
+        x_tbt.append(res.particles[i_turn].x.copy())
+        px_tbt.append(res.particles[i_turn].px.copy())
+        y_tbt.append(res.particles[i_turn].y.copy())
+        py_tbt.append(res.particles[i_turn].py.copy())
+        sigma_tbt.append(res.particles[i_turn].sigma.copy())
+        delta_tbt.append(res.particles[i_turn].delta.copy())
+
+    x_tbt = np.array(x_tbt)
+    px_tbt = np.array(px_tbt)
+    y_tbt = np.array(y_tbt)
+    py_tbt = np.array(py_tbt)
+    sigma_tbt = np.array(sigma_tbt)
+    delta_tbt = np.array(delta_tbt)
+
+    return x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt
+
+
+
 def betafun_from_ellip(x_tbt, px_tbt):
 
     x_max = np.max(x_tbt)
