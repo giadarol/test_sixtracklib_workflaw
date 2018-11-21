@@ -2,6 +2,10 @@ import sixtracktools
 import pysixtrack
 import pysixtrack.helpers as hp
 import pickle
+import os
+
+os.system('./runsix')
+
 
 
 import numpy as np
