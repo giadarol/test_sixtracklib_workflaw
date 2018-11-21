@@ -8,7 +8,7 @@ import numpy as np
 track_with = 'PySixtrack'
 track_with = 'Sixtrack'
 
-n_turns = 3
+n_turns = 10
 
 with open('line.pkl', 'rb') as fid:
     line = pickle.load(fid)
@@ -34,8 +34,8 @@ Dx_wrt_CO_m, Dpx_wrt_CO_rad,\
         Dsigma_wrt_CO_m=0., Ddelta_wrt_CO=0.)
 
 elements = pysixtracklib.Elements.fromline(line)
-for name, etype, ele in line:
-    getattr(elements, etype)(**ele._asdict())
+# for name, etype, ele in line:
+#     getattr(elements, etype)(**ele._asdict())
 elements.tofile("elements.buffer")
 
 n_part = len(Dx_wrt_CO_m)

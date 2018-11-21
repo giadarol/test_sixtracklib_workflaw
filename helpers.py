@@ -219,8 +219,8 @@ def track_particle_sixtracklib(
 
     import pysixtracklib
     elements = pysixtracklib.Elements.fromline(line)
-    for name, etype, ele in line:
-        getattr(elements, etype)(**ele._asdict())
+    # for name, etype, ele in line:
+    #     getattr(elements, etype)(**ele._asdict())
     elements.tofile("elements.buffer")
 
     n_part = len(Dx_wrt_CO_m)
@@ -247,8 +247,9 @@ def track_particle_sixtracklib(
 
     ps.tofile('particles.buffer')
 
-    os.system('../sixtracklib/build/examples/c99/track_io_c99 particles.buffer elements.buffer %d 0 %d 1'%(n_turns, n_turns))
+    os.system('../sixtracklib/build/examples/c99/track_io_c99 particles.buffer elements.buffer %d 0 %d 0'%(n_turns, n_turns))
 
+    print("Done tracking. Loading data")
     # res = pysixtracklib.ParticlesSet.fromfile('particles.buffer')
     res = pysixtracklib.ParticlesSet.fromfile('output_particles.bin')
 
@@ -259,7 +260,6 @@ def track_particle_sixtracklib(
     sigma_tbt = []
     delta_tbt = []
     for i_turn in range(n_turns):
-        print(i_turn)
         x_tbt.append(res.particles[i_turn].x.copy())
         px_tbt.append(res.particles[i_turn].px.copy())
         y_tbt.append(res.particles[i_turn].y.copy())
