@@ -3,6 +3,7 @@ import pysixtracklib
 import helpers as hp
 import pysixtrack
 import os
+import numpy as np
 
 track_with = 'PySixtrack'
 track_with = 'Sixtrack'
@@ -61,7 +62,30 @@ for i_part in range(n_part):
 
 ps.tofile('particles.buffer')
 
-os.system('../sixtracklib/build/examples/c99/track_io_c99 particles.buffer elements.buffer 10 0 10 1')
+os.system('../sixtracklib/build/examples/c99/track_io_c99 particles.buffer elements.buffer %d 0 %d 1'%(n_turns, n_turns))
 
 # res = pysixtracklib.ParticlesSet.fromfile('particles.buffer')
 res = pysixtracklib.ParticlesSet.fromfile('output_particles.bin')
+
+
+x_tbt = []
+px_tbt = []
+y_tbt = []
+py_tbt = []
+sigma_tbt = []
+delta_tbt = []
+for i_turn in range(n_turns):
+
+    x_tbt.append(res.particles[i_turn].x.copy())
+    px_tbt.append(res.particles[i_turn].px.copy())
+    y_tbt.append(res.particles[i_turn].y.copy())
+    py_tbt.append(res.particles[i_turn].py.copy())
+    sigma_tbt.append(res.particles[i_turn].sigma.copy())
+    delta_tbt.append(res.particles[i_turn].delta.copy())
+
+x_tbt = np.array(x_tbt)
+px_tbt = np.array(px_tbt)
+y_tbt = np.array(y_tbt)
+py_tbt = np.array(py_tbt)
+sigma_tbt = np.array(sigma_tbt)
+delta_tbt = np.array(delta_tbt)
